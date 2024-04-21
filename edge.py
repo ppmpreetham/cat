@@ -38,3 +38,66 @@ def parse_atom(s):
         return ['val', json.loads(s)]
     except json.JSONDecodeError:
         return s
+    
+def pl_parse(s):
+    idx, node = parse_expr(s, 0)
+    idx = skip_space(s, idx)
+    if idx < len(s):
+        raise ValueError('trailing garbage')
+    return node
+
+def pl_eval(node):
+    if len(node) == 0:
+        raise ValueError('empty list')
+
+    # bool, number, string and etc
+    if len(node) == 2 and node[0] == 'val':
+        return node[1]
+    
+    # binary operators
+    import operator
+
+    binops = {'+': operator.add,
+    '-': operator.sub,
+    '*': operator.mul,
+    '/': operator.truediv,
+    'eq': operator.eq,
+    'ne': operator.ne,
+    'ge': operator.ge,
+    'gt': operator.gt,
+    'le': operator.le,
+    'lt': operator.lt,
+    'and': operator.and_,
+    'or': operator.or_,
+    'xor': operator.xor,
+    }
+
+    if len(node) == 3 and node[0] in binops:
+        op = binops[node[0]]
+        return op(pl_eval(node[1]), pl_eval(node[2]))
+    
+    # unary operators
+    unops = {
+    '-': operator.neg,
+    'not': operator.not_,
+    '~': operator.not_,op
+    }
+
+    if len(node) == 2 and node[0] in unops:
+        op = unops[node[0]]
+        return op(pl_eval(node[1]))
+
+    if len(node) == 4 and node[0] == '?':
+        _, cond, yes, no = node
+        if pl_eval(cond):
+            return pl_eval(yes)
+        else:
+            return pl_eval(no)
+        
+    if node[0] == 'print':
+        return print(*(pl_eval(val) for val in node[1:]))
+
+
+
+
+    
