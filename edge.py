@@ -28,8 +28,16 @@ def parse_expr(s: str, idx: int):
 
 
 def skip_space(s, idx):
-    while idx < len(s) and s[idx].isspace():
-       idx += 1
+    while 1:
+        save = idx
+        while idx < len(s) and s[idx].isspace():
+            idx += 1
+        if idx < len(s) and s[idx] == ';':
+            idx += 1
+            while idx < len(s) and s[idx] != '\n':
+                idx += 1
+        if idx == save:
+            break
     return idx
 
 def parse_atom(s):
@@ -57,16 +65,17 @@ def pl_eval(node):
     # binary operators
     import operator
 
-    binops = {'+': operator.add,
+    binops = {
+    '+': operator.add,
     '-': operator.sub,
     '*': operator.mul,
     '/': operator.truediv,
-    'eq': operator.eq,
-    'ne': operator.ne,
-    'ge': operator.ge,
-    'gt': operator.gt,
-    'le': operator.le,
-    'lt': operator.lt,
+    '=': operator.eq,
+    '!=': operator.ne,
+    '>=': operator.ge,
+    '>': operator.gt,
+    '<=': operator.le,
+    '<': operator.lt,
     'and': operator.and_,
     'or': operator.or_,
     'xor': operator.xor,
@@ -80,7 +89,7 @@ def pl_eval(node):
     unops = {
     '-': operator.neg,
     'not': operator.not_,
-    '~': operator.not_,op
+    '~': operator.not_,
     }
 
     if len(node) == 2 and node[0] in unops:
@@ -93,9 +102,20 @@ def pl_eval(node):
             return pl_eval(yes)
         else:
             return pl_eval(no)
-        
-    if node[0] == 'print':
+    
+    # Print statement here
+    if node[0] == 'meow':
         return print(*(pl_eval(val) for val in node[1:]))
+    raise ValueError('unknown expression')
+
+def evaluate(s):
+    return pl_eval(pl_parse(s))
+
+string = str(input())
+print(evaluate(string))
+
+
+
 
 
 
