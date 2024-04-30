@@ -54,7 +54,18 @@ def pl_parse(s):
         raise ValueError('trailing garbage')
     return node
 
-def pl_eval(node):
+def name_loopup(env, key):
+    while env:
+        current, env = env
+        if key in current:
+            return current
+    raise ValueError('undefined name')
+
+def pl_eval(env,node):
+    if not isinstance(node, list):
+        assert isinstance(node, str)
+        return name_loopup(env, node)[node]
+    
     if len(node) == 0:
         raise ValueError('empty list')
 
@@ -113,11 +124,5 @@ def evaluate(s):
 
 string = str(input())
 print(evaluate(string))
-
-
-
-
-
-
 
     
