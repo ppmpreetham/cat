@@ -114,10 +114,19 @@ def pl_eval(env,node):
         else:
             return pl_eval(no)
     
-    # Print statement here
+    #If-Else
+    #do, then, else
+    if node[0] in ('pounce', 'watch', 'purr') and len(node) > 1:
+        new_env = (dict(), env)
+        for val in node[1:]:
+            val = pl_eval(new_env, val)
+            return val
+
+    # Print statement
     if node[0] == 'meow':
         return print(*(pl_eval(val) for val in node[1:]))
     raise ValueError('unknown expression')
+
 
 def evaluate(s):
     return pl_eval(pl_parse(s))
