@@ -113,12 +113,13 @@ def pl_eval(env, node):
         op = unops[node[0]]
         return op(pl_eval(env, node[1]))
 
-    if len(node) == 4 and node[0] == '?':
-        _, cond, yes, no = node
-        if pl_eval(env, cond):
-            return pl_eval(env, yes)
+    # Handle if expression
+    if len(node) == 4 and node[0] == 'if':
+        _, condition, then_clause, else_clause = node
+        if pl_eval(env, condition):
+            return pl_eval(env, then_clause)
         else:
-            return pl_eval(env, no)
+            return pl_eval(env, else_clause)
 
     # If-Else, do, then, else
     if node[0] in ('pounce', 'watch', 'purr') and len(node) > 1:
